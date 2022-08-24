@@ -11,10 +11,6 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list topics or brokers",
-
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Println("list called")
-	// },
 }
 
 func init() {

@@ -2,20 +2,14 @@ package xkafka
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/segmentio/kafka-go"
-	"github.com/wahidx/kafkax/config"
 )
 
 func ListTopics() {
-	if len(config.KAFKA_HOST) == 0 {
-		fmt.Println("Broker is blank")
-		return
-	}
-
-	conn, err := kafka.Dial("tcp", config.KAFKA_HOST[0])
+	conn, err := getConnection()
 	if err != nil {
-		fmt.Println("Failed to connect to Kafka\n", err)
 		return
 	}
 	defer conn.Close()
@@ -31,8 +25,35 @@ func ListTopics() {
 		m[p.Topic] = true
 	}
 
+	count := 1
 	fmt.Println("Topics:")
 	for k := range m {
-		fmt.Println(k)
+		fmt.Println(strconv.Itoa(count) + ". " + k)
+		count++
 	}
+}
+
+func CreateTopic(topic string, partition int, replica int) {
+	// conn, err := getControllerConnection()	// TODO: enable incase auto.create.topics.enable='false'
+	conn, err := getConnection()
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	topicConfigs := []kafka.TopicConfig{
+		{
+			Topic:             topic,
+			NumPartitions:     partition,
+			ReplicationFactor: replica,
+		},
+	}
+
+	err = conn.CreateTopics(topicConfigs...)
+	if err != nil {
+		fmt.Println("Failed to create topics\n", err)
+		return
+	}
+
+	fmt.Println("Topic: " + topic + " is created")
 }
