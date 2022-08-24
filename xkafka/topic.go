@@ -34,8 +34,7 @@ func ListTopics() {
 }
 
 func CreateTopic(topic string, partition int, replica int) {
-	// conn, err := getControllerConnection()	// TODO: enable incase auto.create.topics.enable='false'
-	conn, err := getConnection()
+	conn, err := getControllerConnection()
 	if err != nil {
 		return
 	}
@@ -55,5 +54,22 @@ func CreateTopic(topic string, partition int, replica int) {
 		return
 	}
 
-	fmt.Println("Topic: " + topic + " is created")
+	fmt.Println("Topic '" + topic + "' created successfully")
+}
+
+func DeleteTopic(topics ...string) {
+	conn, err := getControllerConnection()
+	if err != nil {
+		return
+	}
+
+	defer conn.Close()
+
+	err = conn.DeleteTopics(topics...)
+	if err != nil {
+		fmt.Println("Failed to delete topic\n", err)
+		return
+	}
+
+	fmt.Println("Topics deleted successfully")
 }

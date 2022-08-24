@@ -40,7 +40,6 @@ func getControllerConnection() (*kafka.Conn, error) {
 		fmt.Println("Failed to get controller connection\n", err)
 		return nil, err
 	}
-	defer controllerConn.Close()
 
 	return controllerConn, nil
 }
