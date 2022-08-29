@@ -9,6 +9,9 @@ import (
 	"github.com/wahidx/kafkax/config"
 )
 
+// Need to create one more function to create topic if not present and publish
+
+// Publish will publish message to a kafka broker with key headers
 func Publish(topic, message, key string, headerMap map[string]string) {
 	writer := &kafka.Writer{
 		Addr:  kafka.TCP(config.KAFKA_HOST...),
