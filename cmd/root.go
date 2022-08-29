@@ -24,4 +24,6 @@ func Execute() {
 	}
 }
 
-func init() {}
+func init() {
+	rootCmd.PersistentFlags().StringP("broker", "b", "", "Kafka broker (comma separated)")
+}

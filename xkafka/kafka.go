@@ -44,12 +44,13 @@ func getControllerConnection() (*kafka.Conn, error) {
 	return controllerConn, nil
 }
 
-func Ping() {
+func Ping() error {
 	conn, err := getConnection()
 	if err != nil {
-		return
+		return err
 	}
 
 	fmt.Println("Kafka connected")
 	conn.Close()
+	return nil
 }

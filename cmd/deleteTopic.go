@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/wahidx/kafkax/utils"
 	"github.com/wahidx/kafkax/xkafka"
 )
 
@@ -18,6 +19,14 @@ var deleteTopicCmd = &cobra.Command{
 	Long:  "For multiple topics, pass comma separated topics",
 
 	Run: func(cmd *cobra.Command, args []string) {
+		broker, err := cmd.Flags().GetString("broker")
+		if err != nil {
+			fmt.Println("Invalid broker")
+			return
+		} else if len(broker) != 0 {
+			utils.SetBroker(broker)
+		}
+
 		topicsStr, err := cmd.Flags().GetString("topic")
 		if err != nil || len(topicsStr) == 0 {
 			fmt.Println("Invalid topics")

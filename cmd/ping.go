@@ -31,6 +31,4 @@ var pingCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(pingCmd)
-
-	rootCmd.PersistentFlags().StringP("broker", "b", "", "Kafka broker (comma separated)")
 }

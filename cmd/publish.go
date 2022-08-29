@@ -19,6 +19,14 @@ var publishCmd = &cobra.Command{
 	Short: "Publish message to a topic",
 
 	Run: func(cmd *cobra.Command, args []string) {
+		broker, err := cmd.Flags().GetString("broker")
+		if err != nil {
+			fmt.Println("Invalid broker")
+			return
+		} else if len(broker) != 0 {
+			utils.SetBroker(broker)
+		}
+
 		topic, err := cmd.Flags().GetString("topic")
 		if err != nil || len(topic) == 0 {
 			fmt.Println("Invalid topic")

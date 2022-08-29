@@ -7,15 +7,24 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/wahidx/kafkax/utils"
 	"github.com/wahidx/kafkax/xkafka"
 )
 
 // consumeCmd represents the consume command
 var consumeCmd = &cobra.Command{
 	Use:   "consume",
-	Short: "consume messages of a topic",
+	Short: "Consume messages of a topic",
 
 	Run: func(cmd *cobra.Command, args []string) {
+		broker, err := cmd.Flags().GetString("broker")
+		if err != nil {
+			fmt.Println("Invalid broker")
+			return
+		} else if len(broker) != 0 {
+			utils.SetBroker(broker)
+		}
+
 		topic, err := cmd.Flags().GetString("topic")
 		if err != nil || len(topic) == 0 {
 			fmt.Println("Invalid topic")

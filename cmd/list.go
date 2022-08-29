@@ -10,7 +10,7 @@ import (
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "list topics or brokers",
+	Short: "List topics or brokers",
 }
 
 func init() {
