@@ -4,9 +4,12 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/wahidx/kafkax/utils"
 	"github.com/wahidx/kafkax/xkafka"
 )
 
@@ -17,14 +20,8 @@ var publishCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		topic, err := cmd.Flags().GetString("topic")
-		if err != nil {
-			fmt.Println("Invalid topic name")
-			return
-		}
-
-		message, err := cmd.Flags().GetString("message")
-		if err != nil {
-			fmt.Println("Invalid message")
+		if err != nil || len(topic) == 0 {
+			fmt.Println("Invalid topic")
 			return
 		}
 
@@ -34,7 +31,25 @@ var publishCmd = &cobra.Command{
 			return
 		}
 
-		xkafka.Publish(topic, message, key)
+		headers, err := cmd.Flags().GetStringArray("header")
+		if err != nil {
+			fmt.Println("Invalid header")
+			return
+		}
+		header := utils.ReadHeaders(headers)
+
+		fmt.Println("Press Ctrl+C to exit")
+
+		reader := bufio.NewReader(os.Stdin)
+		for {
+			line, _, err := reader.ReadLine()
+			if err != nil {
+				fmt.Println("Failed to read\n", err)
+				return
+			}
+
+			xkafka.Publish(topic, string(line), key, header)
+		}
 	},
 }
 
@@ -42,6 +57,6 @@ func init() {
 	rootCmd.AddCommand(publishCmd)
 
 	publishCmd.PersistentFlags().StringP("topic", "t", "", "")
-	publishCmd.PersistentFlags().StringP("message", "m", "", "")
 	publishCmd.PersistentFlags().StringP("key", "k", "", "")
+	publishCmd.PersistentFlags().StringArrayP("header", "H", []string{}, "syntax: key1=val1")
 }
