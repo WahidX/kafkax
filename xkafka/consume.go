@@ -1,0 +1,4 @@
+package xkafka
+
+func Consume() {
+}
