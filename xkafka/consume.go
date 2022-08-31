@@ -9,15 +9,20 @@ import (
 	"github.com/wahidx/kafkax/config"
 )
 
-func Consume(topic, groupID string, isJSON bool) {
+func Consume(opts ConsumerOptions) {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:     config.KAFKA_HOST,
-		GroupID:     groupID,
-		Topic:       topic,
+		GroupID:     opts.GroupID,
+		Topic:       opts.Topic,
 		MinBytes:    5,
 		MaxBytes:    10e6, // 10MB
-		StartOffset: kafka.LastOffset,
+		Partition:   opts.Partition,
+		StartOffset: kafka.FirstOffset,
 	})
+
+	if opts.Offset != 0 {
+		r.SetOffset(opts.Offset)
+	}
 
 	for {
 		m, err := r.ReadMessage(context.Background())
@@ -26,7 +31,7 @@ func Consume(topic, groupID string, isJSON bool) {
 			break
 		}
 
-		printer(m, isJSON)
+		printer(m, opts.IsJSON)
 	}
 
 	if err := r.Close(); err != nil {
