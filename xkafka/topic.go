@@ -20,15 +20,15 @@ func ListTopics() {
 		return
 	}
 
-	m := map[string]bool{}
+	m := map[string]int{}
 	for _, p := range partitions {
-		m[p.Topic] = true
+		m[p.Topic] = p.ID
 	}
 
 	count := 1
 	fmt.Println("Topics:")
 	for k := range m {
-		fmt.Println(strconv.Itoa(count) + ". " + k)
+		fmt.Println(strconv.Itoa(count) + ". " + k + "(partition:" + strconv.Itoa(m[k]) + ")")
 		count++
 	}
 }
