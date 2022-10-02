@@ -9,6 +9,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/topics"
 	"github.com/wahidx/kafkax/config"
+	"github.com/wahidx/kafkax/entities"
 )
 
 func ListTopics(isJSON bool) {
@@ -35,7 +36,15 @@ func ListTopics(isJSON bool) {
 
 	// printing
 	if isJSON {
-		jsonOut, _ := json.Marshal(m)
+		topics := []*entities.Topic{}
+		for name, partitions := range m {
+			topics = append(topics, &entities.Topic{
+				Name:       name,
+				Partitions: partitions,
+			})
+		}
+
+		jsonOut, _ := json.Marshal(topics)
 		fmt.Println(string(jsonOut))
 		return
 	}
@@ -57,18 +66,24 @@ func FindTopics(key string, isJSON bool) {
 	}
 
 	topicMap := map[string][]int{}
+	topicsJ := []*entities.Topic{}
 	for _, t := range topics {
 		ps := []int{}
 		for _, p := range t.Partitions {
 			ps = append(ps, p.ID)
 		}
 
+		topicsJ = append(topicsJ, &entities.Topic{
+			Name:       t.Name,
+			Partitions: ps,
+		})
+
 		topicMap[t.Name] = ps
 	}
 
 	// printing
 	if isJSON {
-		jsonOut, _ := json.Marshal(topicMap)
+		jsonOut, _ := json.Marshal(topicsJ)
 		fmt.Println(string(jsonOut))
 		return
 	}
