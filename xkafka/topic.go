@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"strconv"
 
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/topics"
@@ -33,11 +32,8 @@ func ListTopics() {
 		}
 	}
 
-	count := 1
-	fmt.Println("Topics:")
 	for topicName := range m {
-		fmt.Println(strconv.Itoa(count) + ". " + topicName + " (partitions:" + fmt.Sprint(m[topicName]) + " )")
-		count++
+		fmt.Println(topicName, fmt.Sprint(m[topicName]))
 	}
 }
 
@@ -53,7 +49,11 @@ func FindTopics(key string) {
 	}
 
 	for _, t := range topics {
-		fmt.Println(t.Name)
+		ps := []int{}
+		for _, p := range t.Partitions {
+			ps = append(ps, p.ID)
+		}
+		fmt.Println(t.Name, ps)
 	}
 }
 
