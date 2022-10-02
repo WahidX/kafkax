@@ -25,14 +25,20 @@ var listTopicCmd = &cobra.Command{
 			utils.SetBroker(broker)
 		}
 
+		j, err := cmd.Flags().GetBool("json")
+		if err != nil {
+			fmt.Println("Invalid search key")
+			return
+		}
+
 		key, err := cmd.Flags().GetString("sKey")
 		if err != nil {
 			fmt.Println("Invalid search key")
 			return
 		} else if len(key) > 0 {
-			xkafka.FindTopics(key)
+			xkafka.FindTopics(key, j)
 		} else {
-			xkafka.ListTopics()
+			xkafka.ListTopics(j)
 		}
 
 	},
@@ -42,4 +48,5 @@ func init() {
 	listCmd.AddCommand(listTopicCmd)
 
 	listCmd.PersistentFlags().StringP("sKey", "s", "", "Search key")
+	listCmd.PersistentFlags().BoolP("json", "j", false, "JSON stdout")
 }

@@ -2,6 +2,7 @@ package xkafka
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"regexp"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/wahidx/kafkax/config"
 )
 
-func ListTopics() {
+func ListTopics(isJSON bool) {
 	conn, err := getConnection()
 	if err != nil {
 		return
@@ -32,12 +33,19 @@ func ListTopics() {
 		}
 	}
 
-	for topicName := range m {
-		fmt.Println(topicName, fmt.Sprint(m[topicName]))
+	// printing
+	if isJSON {
+		jsonOut, _ := json.Marshal(m)
+		fmt.Println(string(jsonOut))
+		return
+	}
+
+	for topicName, partitions := range m {
+		fmt.Println(topicName, partitions)
 	}
 }
 
-func FindTopics(key string) {
+func FindTopics(key string, isJSON bool) {
 	topics, err := topics.ListRe(context.Background(),
 		&kafka.Client{Addr: kafka.TCP(config.KAFKA_HOST...)},
 		regexp.MustCompile(key),
@@ -48,12 +56,25 @@ func FindTopics(key string) {
 		return
 	}
 
+	topicMap := map[string][]int{}
 	for _, t := range topics {
 		ps := []int{}
 		for _, p := range t.Partitions {
 			ps = append(ps, p.ID)
 		}
-		fmt.Println(t.Name, ps)
+
+		topicMap[t.Name] = ps
+	}
+
+	// printing
+	if isJSON {
+		jsonOut, _ := json.Marshal(topicMap)
+		fmt.Println(string(jsonOut))
+		return
+	}
+
+	for t, ps := range topicMap {
+		fmt.Println(t, ps)
 	}
 }
 
