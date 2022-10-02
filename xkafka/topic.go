@@ -1,10 +1,14 @@
 package xkafka
 
 import (
+	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 
 	"github.com/segmentio/kafka-go"
+	"github.com/segmentio/kafka-go/topics"
+	"github.com/wahidx/kafkax/config"
 )
 
 func ListTopics() {
@@ -20,16 +24,36 @@ func ListTopics() {
 		return
 	}
 
-	m := map[string]int{}
+	m := map[string][]int{}
 	for _, p := range partitions {
-		m[p.Topic] = p.ID
+		if partitions := m[p.Topic]; partitions != nil {
+			m[p.Topic] = append(m[p.Topic], p.ID)
+		} else {
+			m[p.Topic] = []int{p.ID}
+		}
 	}
 
 	count := 1
 	fmt.Println("Topics:")
-	for k := range m {
-		fmt.Println(strconv.Itoa(count) + ". " + k + "(partition:" + strconv.Itoa(m[k]) + ")")
+	for topicName := range m {
+		fmt.Println(strconv.Itoa(count) + ". " + topicName + " (partitions:" + fmt.Sprint(m[topicName]) + " )")
 		count++
+	}
+}
+
+func FindTopics(key string) {
+	topics, err := topics.ListRe(context.Background(),
+		&kafka.Client{Addr: kafka.TCP(config.KAFKA_HOST...)},
+		regexp.MustCompile(key),
+	)
+
+	if err != nil {
+		fmt.Println("Failed to search with key: ", key, "\nerorr:", err)
+		return
+	}
+
+	for _, t := range topics {
+		fmt.Println(t.Name)
 	}
 }
 

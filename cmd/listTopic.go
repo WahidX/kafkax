@@ -25,10 +25,21 @@ var listTopicCmd = &cobra.Command{
 			utils.SetBroker(broker)
 		}
 
-		xkafka.ListTopics()
+		key, err := cmd.Flags().GetString("sKey")
+		if err != nil {
+			fmt.Println("Invalid search key")
+			return
+		} else if len(key) > 0 {
+			xkafka.FindTopics(key)
+		} else {
+			xkafka.ListTopics()
+		}
+
 	},
 }
 
 func init() {
 	listCmd.AddCommand(listTopicCmd)
+
+	listCmd.PersistentFlags().StringP("sKey", "s", "", "Search key")
 }
