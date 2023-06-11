@@ -56,7 +56,7 @@ func printer(msg kafka.Message, isJSON bool) {
 		msgPayload = string(msg.Value)
 	}
 
-	data := map[string]any{
+	m := map[string]any{
 		"topic":         msg.Topic,
 		"timestamp":     msg.Time,
 		"partition":     msg.Partition,
@@ -67,11 +67,11 @@ func printer(msg kafka.Message, isJSON bool) {
 		"headers":       msg.Headers,
 	}
 
-	b, err := json.MarshalIndent(data, "", "  ")
+	b, err := json.Marshal(m)
 	if err != nil {
 		fmt.Println("Failed to format message in JSON\n", err)
 		return
 	}
 
-	fmt.Println(string(b) + "\n")
+	fmt.Println(string(b))
 }
